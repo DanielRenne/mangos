@@ -667,6 +667,14 @@ func (l *listener) SetOption(n string, v interface{}) error {
 
 // serve spins in a loop, calling the accepter's Accept routine.
 func (l *listener) serve() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Panic Recovered at mangos.core.serve:  " + fmt.Sprintf("%+v", r))
+			time.Sleep(time.Millisecond * 10)
+			l.serve()
+			return
+		}
+	}()
 	for {
 		select {
 		case <-l.sock.closeq:
